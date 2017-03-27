@@ -1,0 +1,9 @@
+﻿Group: Payment methods
+FriendlyName: Payment Express (DPS) - PxPost
+SystemName: Hazzik.Nop.Plugin.Payments.PxPost
+Version: 1.0
+SupportedVersions: 3.90
+Author: Alexander Zaytsev
+DisplayOrder: 1
+FileName: Hazzik.Nop.Plugin.Payments.PxPost.dll
+Description: This plugin enables credit Payment Express (DPS) Payments
