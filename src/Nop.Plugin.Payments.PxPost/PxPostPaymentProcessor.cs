@@ -55,7 +55,7 @@ namespace Hazzik.Nop.Plugin.Payments.PxPost
             var response = new HttpClient().PostAsync("https://uat.paymentexpress.com/pxpost.aspx", new StreamContent(request)).Result;
             var responseStream = response.Content.ReadAsStreamAsync().Result;
 
-            var txnResponse = (TxnResponse) new XmlSerializer(typeof(TxnResponse)).Deserialize(responseStream);
+            var txnResponse = XmlSerializationHelper.FromStream<TxnResponse>(responseStream);
 
             var result = new ProcessPaymentResult {AllowStoringCreditCardNumber = false};
 
@@ -67,7 +67,16 @@ namespace Hazzik.Nop.Plugin.Payments.PxPost
 
             var transaction = txnResponse.Transaction;
 
-            result.NewPaymentStatus = _pxPostPaymentSettings.TransactMode == TransactMode.Authorize ? PaymentStatus.Authorized : PaymentStatus.Paid;
+            if (_pxPostPaymentSettings.TransactMode == TransactMode.Authorize)
+            {
+                result.NewPaymentStatus = PaymentStatus.Authorized;
+                result.AuthorizationTransactionId = txnResponse.DpsTxnRef;
+            }
+            else
+            {
+                result.NewPaymentStatus = PaymentStatus.Paid;
+                result.CaptureTransactionId = txnResponse.DpsTxnRef;
+            }
 
             return result;
         }
@@ -98,9 +107,18 @@ namespace Hazzik.Nop.Plugin.Payments.PxPost
             var response = new HttpClient().PostAsync("https://uat.paymentexpress.com/pxpost.aspx", new StreamContent(request)).Result;
             var responseStream = response.Content.ReadAsStreamAsync().Result;
 
-            var txnResponse = (TxnResponse)new XmlSerializer(typeof(TxnResponse)).Deserialize(responseStream);
+            var txnResponse = XmlSerializationHelper.FromStream<TxnResponse>(responseStream);
 
             var result = new CapturePaymentResult();
+            if (txnResponse.Success == 0)
+            {
+                result.AddError(txnResponse.ResponseText);
+                return result;
+            }
+
+            result.NewPaymentStatus = PaymentStatus.Paid;
+            result.CaptureTransactionId = txnResponse.DpsTxnRef;
+
             return result;
         }
 

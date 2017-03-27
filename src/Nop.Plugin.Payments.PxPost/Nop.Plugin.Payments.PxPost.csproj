@@ -78,7 +78,7 @@
     <Compile Include="Core\TxnRequest.cs" />
     <Compile Include="Core\TxnResponse.cs" />
     <Compile Include="Core\TxnTransaction.cs" />
-    <Compile Include="Core\XmlHelper.cs" />
+    <Compile Include="Core\XmlSerializationHelper.cs" />
     <Compile Include="PxPostPaymentProcessor.cs" />
     <Compile Include="PxPostPaymentSettings.cs" />
     <Compile Include="Models\ConfigurationModel.cs" />
